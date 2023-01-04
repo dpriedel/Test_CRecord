@@ -35,8 +35,10 @@ endif
 OUTFILE := Unit_Test
 
 CFG_INC := -I${HOME}/projects/ModernCRecord/CRecord/src \
+	-I${HOME}/projects/ModernCRecord/CPP_Antlr_Record_Desc \
 	-I$(GTESTDIR) \
-	-I$(BOOSTDIR)
+	-I$(BOOSTDIR) \
+	-I/usr/include/antlr4-runtime
 
 RPATH_LIB := -Wl,-rpath,$(GCCDIR)/lib64 -Wl,-rpath,$(BOOSTDIR)/lib -Wl,-rpath,/usr/local/lib
 
@@ -44,7 +46,9 @@ SDIR1 := .
 SRCS1 := $(SDIR1)/Unit_Test.cpp
 
 SDIR2 := ../CRecord/src
-SRCS2 := $(SDIR2)/CRecord.cpp
+SRCS2 := $(SDIR2)/CRecord.cpp \
+	$(SDIR2)/CField.cpp \
+	$(SDIR2)/CRecordDescParser.cpp
 
 # SDIR3 := $(DECIMALSRCDIR)
 # SRCS3 := $(SDIR3)/decQuad.c \
@@ -70,6 +74,7 @@ CFG_LIB := -L/usr/local/lib \
 		-lfmt \
 		-lspdlog \
 		-lpthread \
+		-lantlr4-runtime \
 		-ldl -lutil -lm -lm \
 		-L$(GCCDIR)/lib64
 
