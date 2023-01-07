@@ -35,6 +35,7 @@ endif
 OUTFILE := Unit_Test
 
 CFG_INC := -I${HOME}/projects/ModernCRecord/CRecord/src \
+	-I${HOME}/projects/ModernCRecord/common_utilities/include \
 	-I${HOME}/projects/ModernCRecord/CPP_Antlr_Record_Desc \
 	-I$(GTESTDIR) \
 	-I$(BOOSTDIR) \
@@ -50,15 +51,17 @@ SRCS2 := $(SDIR2)/CRecord.cpp \
 	$(SDIR2)/CField.cpp \
 	$(SDIR2)/CRecordDescParser.cpp
 
-# SDIR3 := $(DECIMALSRCDIR)
-# SRCS3 := $(SDIR3)/decQuad.c \
-# 		 $(SDIR3)/decNumber.c \
+SDIR3 := ../CPP_Antlr_Record_Desc
+SRCS3 := $(SDIR3)/CPP_Record_DescLexer.cpp \
+		 $(SDIR3)/CPP_Record_DescParser.cpp
 # 		 $(SDIR3)/decContext.c
 
+SDIR3a := ../common_utilities/src
+SRCS3a := $(SDIR3a)/utilities.cpp
 
-SRCS := $(SRCS1) $(SRCS2) # $(SRCS3) $(SRCS3a) $(SRCS4)
+SRCS := $(SRCS1) $(SRCS2) $(SRCS3) $(SRCS3a) # $(SRCS4)
 
-VPATH := $(SDIR1):$(SDIR2)#:$(SDIR3):$(SDIR3a):$(SDIR4)
+VPATH := $(SDIR1):$(SDIR2):$(SDIR3):$(SDIR3a)#:$(SDIR4)
 
 #
 # Configuration: Debug
@@ -80,9 +83,10 @@ CFG_LIB := -L/usr/local/lib \
 
 OBJS1=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS1)))))
 OBJS2=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS2)))))
-# OBJS3=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS3)))))
+OBJS3=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS3)))))
+OBJS3a=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS3a)))))
 
-OBJS=$(OBJS1) $(OBJS2)# $(OBJS3) $(OBJS3a) $(OBJS4)
+OBJS=$(OBJS1) $(OBJS2) $(OBJS3) $(OBJS3a) #$(OBJS4)
 
 DEPS=$(OBJS:.o=.d)
 
@@ -101,7 +105,7 @@ $(OUTDIR)/%.o : %.cpp
 $(OUTDIR)/%.o : %.c
 	$(CCOMPILE)
 
-$(OUTFILE): $(OUTDIR) $(OBJS1) $(OBJS2) # $(OBJS3) $(OBJS3a) $(OBJS4)
+$(OUTFILE): $(OUTDIR) $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS3a) # $(OBJS4)
 	$(LINK)
 
 -include $(DEPS)
