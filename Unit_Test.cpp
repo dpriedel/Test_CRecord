@@ -47,6 +47,8 @@ namespace fs = std::filesystem;
 
 using namespace testing;
 
+#include "CRecord.h"
+#include "CRecordDescParser.h"
 
 // NOLINTBEGIN(*-magic-numbers)
 //
@@ -55,14 +57,27 @@ using namespace testing;
 
 // some utility code for generating test data
 
-class RangeSplitterBasicFunctionality : public Test
+class RecordDescFileParser : public Test
 {
 
 };
 
-TEST_F(RangeSplitterBasicFunctionality, Test1)    //NOLINT
+TEST_F(RecordDescFileParser, VerifyThrowsIfInputFileNotFound)    //NOLINT
 {
-    
+    // this is just a basic test to get things started.
+
+    CRecordDescParser my_parser;
+  
+    ASSERT_THROW(my_parser.ParseRecordDescFile("/tmp/xxx"), std::invalid_argument);
+};
+
+TEST_F(RecordDescFileParser, VerifyCanReadRecordDescFile)    //NOLINT
+{
+    // this is just a basic test to get things started.
+
+    CRecordDescParser my_parser;
+  
+    ASSERT_NO_THROW(my_parser.ParseRecordDescFile("./test_files/file1_Record_Desc"));
 };
 
 class Timer : public Test
