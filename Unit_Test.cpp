@@ -108,7 +108,6 @@ void InitLogging ()
 
 int main(int argc, char** argv)
 {
-
     InitLogging();
 
 

@@ -49,11 +49,14 @@ SRCS1 := $(SDIR1)/Unit_Test.cpp
 SDIR2 := ../CRecord/src
 SRCS2 := $(SDIR2)/CRecord.cpp \
 	$(SDIR2)/CField.cpp \
-	$(SDIR2)/CRecordDescParser.cpp
+	$(SDIR2)/CRecordDescParser.cpp \
+	$(SDIR2)/CRecordDescVisitor.cpp
 
 SDIR3 := ../CPP_Antlr_Record_Desc
 SRCS3 := $(SDIR3)/CPP_Record_DescLexer.cpp \
-		 $(SDIR3)/CPP_Record_DescParser.cpp
+		 $(SDIR3)/CPP_Record_DescParser.cpp \
+		 $(SDIR3)/CPP_Record_DescVisitor.cpp \
+		 $(SDIR3)/CPP_Record_DescBaseVisitor.cpp
 # 		 $(SDIR3)/decContext.c
 
 SDIR3a := ../common_utilities/src
