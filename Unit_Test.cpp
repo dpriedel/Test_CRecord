@@ -30,6 +30,8 @@
     /* along with Extractor_Markup.  If not, see <http://www.gnu.org/licenses/>. */
 
 
+#include <fstream>
+
 /* #include <gmock/gmock.h> */
 #include <gtest/gtest.h>
 
@@ -38,6 +40,10 @@
 #include <fmt/format.h>
 #include <fmt/chrono.h>
 #include <fmt/ranges.h>
+
+#include <range/v3/algorithm/for_each.hpp>
+#include <range/v3/algorithm/for_each_n.hpp>
+#include <range/v3/view/take.hpp>
 
 
 using namespace std::literals::chrono_literals;
@@ -71,25 +77,68 @@ TEST_F(RecordDescFileParser, VerifyThrowsIfInputFileNotFound)    //NOLINT
     ASSERT_THROW(my_parser.ParseRecordDescFile("/tmp/xxx"), std::invalid_argument);
 };
 
-TEST_F(RecordDescFileParser, VerifyCanReadRecordDescFile)    //NOLINT
+TEST_F(RecordDescFileParser, VerifyCanCreateFixedRecord)    //NOLINT
 {
-    // this is just a basic test to get things started.
-
     CRecordDescParser my_parser;
   
-    ASSERT_NO_THROW(my_parser.ParseRecordDescFile("./test_files/file1_Record_Desc"));
+    auto new_record = my_parser.ParseRecordDescFile("./test_files/file1_Record_Desc");
+    ASSERT_TRUE(new_record);
+
+    // verify new record type is FixedRecord
+    ASSERT_EQ(new_record.value().index(), e_FixedRecord);
+    // test accessing a property
+    ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetBufferLen(), 159);
 };
 
-class Timer : public Test
+TEST_F(RecordDescFileParser, VerifyCanAddAllFields)    //NOLINT
 {
+    CRecordDescParser my_parser;
+  
+    auto new_record = my_parser.ParseRecordDescFile("./test_files/file1_Record_Desc");
+    ASSERT_TRUE(new_record);
 
+    // verify got all fields
+    ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetFields().size(), 9);
 };
 
-TEST_F(Timer, TestCountDownTimer)    //NOLINT
+TEST_F(RecordDescFileParser, VerifyCanMapDataRecord)    //NOLINT
 {
-    
+    CRecordDescParser my_parser;
+  
+    auto new_record = my_parser.ParseRecordDescFile("./test_files/file2_Record_Desc");
+    ASSERT_TRUE(new_record);
+
+    // verify got all fields
+    // ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetFields().size(), 9);
+
+    std::ifstream file_data = std::ifstream("./test_files/file2_data.dat", std::ios::in | std::ios::binary);
+
+    std::string buffer;
+    buffer.reserve(5000);
+
+    auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
+
+    int ctr = 0;
+    while (file_data.good() && ++ctr < 6)
+    {
+        file_data.getline(buffer.data(), buffer.capacity());
+        // fmt::print("buffer: {:30}\n", buffer);
+        fixed_record.UseData(std::string_view{buffer.data(), buffer.size()});
+        fmt::print("{}\n", fixed_record);
+    }
+    file_data.close();
 };
 
+// class Timer : public Test
+// {
+//
+// };
+//
+// TEST_F(Timer, TestCountDownTimer)    //NOLINT
+// {
+//     
+// };
+//
 // NOLINTEND(*-magic-numbers)
 
 //===  FUNCTION  ======================================================================

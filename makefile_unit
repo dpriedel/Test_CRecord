@@ -50,7 +50,8 @@ SDIR2 := ../CRecord/src
 SRCS2 := $(SDIR2)/CRecord.cpp \
 	$(SDIR2)/CField.cpp \
 	$(SDIR2)/CRecordDescParser.cpp \
-	$(SDIR2)/CRecordDescVisitor.cpp
+	$(SDIR2)/CRecordDescVisitor.cpp \
+	$(SDIR2)/CFixedRecord.cpp 
 
 SDIR3 := ../CPP_Antlr_Record_Desc
 SRCS3 := $(SDIR3)/CPP_Record_DescLexer.cpp \
