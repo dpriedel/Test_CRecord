@@ -90,7 +90,20 @@ TEST_F(RecordDescFileParser, VerifyCanCreateFixedRecord)    //NOLINT
     ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetBufferLen(), 159);
 };
 
-TEST_F(RecordDescFileParser, VerifyCanAddAllFields)    //NOLINT
+TEST_F(RecordDescFileParser, VerifyCanCreateVariableRecord)    //NOLINT
+{
+    CRecordDescParser my_parser;
+  
+    auto new_record = my_parser.ParseRecordDescFile("./test_files/file3_Record_Desc");
+    ASSERT_TRUE(new_record);
+
+    // verify new record type is FixedRecord
+    ASSERT_EQ(new_record.value().index(), e_VariableRecord);
+    // test accessing a property
+    ASSERT_EQ(std::get<e_VariableRecord>(new_record.value()).GetFieldCount(), 47);
+};
+
+TEST_F(RecordDescFileParser, VerifyCanAddAllFixedRecordFields)    //NOLINT
 {
     CRecordDescParser my_parser;
   
@@ -99,6 +112,18 @@ TEST_F(RecordDescFileParser, VerifyCanAddAllFields)    //NOLINT
 
     // verify got all fields
     ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetFields().size(), 9);
+};
+
+TEST_F(RecordDescFileParser, VerifyCanAddAllVariableRecordFields)    //NOLINT
+{
+    CRecordDescParser my_parser;
+  
+    auto new_record = my_parser.ParseRecordDescFile("./test_files/file3_Record_Desc");
+    ASSERT_TRUE(new_record);
+
+    // verify got all fields
+    // NOTE: test file has 1 SYNTH field so count is 48.
+    ASSERT_EQ(std::get<e_VariableRecord>(new_record.value()).GetFields().size(), 48);
 };
 
 TEST_F(RecordDescFileParser, VerifyCanMapDataRecord)    //NOLINT
@@ -119,14 +144,47 @@ TEST_F(RecordDescFileParser, VerifyCanMapDataRecord)    //NOLINT
     auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
 
     int ctr = 0;
-    while (file_data.good() && ++ctr < 6)
+    while (file_data.good() /* && ++ctr < 6 */)
     {
         file_data.getline(buffer.data(), buffer.capacity());
         // fmt::print("buffer: {:30}\n", buffer);
         fixed_record.UseData(std::string_view{buffer.data(), buffer.size()});
-        fmt::print("{}\n", fixed_record);
+        // fmt::print("{}\n", fixed_record);
     }
     file_data.close();
+}
+
+TEST_F(RecordDescFileParser, VerifyCanCopyAndMoveThings)    //NOLINT
+{
+    CRecordDescParser my_parser;
+  
+    auto new_record = my_parser.ParseRecordDescFile("./test_files/file2_Record_Desc");
+    ASSERT_TRUE(new_record);
+
+    auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
+    auto record2 = fixed_record;
+
+    // EXPECT_TRUE((record2 <=>  fixed_record) == 0);
+
+    // // verify got all fields
+    // // ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetFields().size(), 9);
+    //
+    // std::ifstream file_data = std::ifstream("./test_files/file2_data.dat", std::ios::in | std::ios::binary);
+    //
+    // std::string buffer;
+    // buffer.reserve(5000);
+    //
+    // auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
+    //
+    // int ctr = 0;
+    // while (file_data.good() && ++ctr < 6)
+    // {
+    //     file_data.getline(buffer.data(), buffer.capacity());
+    //     // fmt::print("buffer: {:30}\n", buffer);
+    //     fixed_record.UseData(std::string_view{buffer.data(), buffer.size()});
+    //     fmt::print("{}\n", fixed_record);
+    // }
+    // file_data.close();
 };
 
 // class Timer : public Test
