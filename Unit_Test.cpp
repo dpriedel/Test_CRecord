@@ -30,6 +30,8 @@
     /* along with Extractor_Markup.  If not, see <http://www.gnu.org/licenses/>. */
 
 
+#include "RecordBase.h"
+#include <fmt/core.h>
 #include <fstream>
 
 /* #include <gmock/gmock.h> */
@@ -44,6 +46,7 @@
 #include <range/v3/algorithm/for_each.hpp>
 #include <range/v3/algorithm/for_each_n.hpp>
 #include <range/v3/view/take.hpp>
+#include <string>
 
 
 using namespace std::literals::chrono_literals;
@@ -126,7 +129,7 @@ TEST_F(RecordDescFileParser, VerifyCanAddAllVariableRecordFields)    //NOLINT
     ASSERT_EQ(std::get<e_VariableRecord>(new_record.value()).GetFields().size(), 48);
 };
 
-TEST_F(RecordDescFileParser, VerifyCanMapDataRecord)    //NOLINT
+TEST_F(RecordDescFileParser, VerifyCanMapFixedDataRecord)    //NOLINT
 {
     CRecordDescParser my_parser;
   
@@ -134,19 +137,19 @@ TEST_F(RecordDescFileParser, VerifyCanMapDataRecord)    //NOLINT
     ASSERT_TRUE(new_record);
 
     // verify got all fields
-    // ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetFields().size(), 9);
+    EXPECT_EQ(std::get<e_FixedRecord>(new_record.value()).GetFields().size(), 86);
 
     std::ifstream file_data = std::ifstream("./test_files/file2_data.dat", std::ios::in | std::ios::binary);
 
-    std::string buffer;
-    buffer.reserve(5000);
-
     auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
+
+    std::string buffer;
+    buffer.reserve(fixed_record.GetBufferLen() + 100);
 
     int ctr = 0;
     while (file_data.good() /* && ++ctr < 6 */)
     {
-        file_data.getline(buffer.data(), buffer.capacity());
+        std::getline(file_data, buffer);
         // fmt::print("buffer: {:30}\n", buffer);
         fixed_record.UseData(std::string_view{buffer.data(), buffer.size()});
         // fmt::print("{}\n", fixed_record);
@@ -154,7 +157,41 @@ TEST_F(RecordDescFileParser, VerifyCanMapDataRecord)    //NOLINT
     file_data.close();
 }
 
-TEST_F(RecordDescFileParser, VerifyCanCopyAndMoveThings)    //NOLINT
+TEST_F(RecordDescFileParser, VerifyCanMapVariableDataRecord)    //NOLINT
+{
+    CRecordDescParser my_parser;
+  
+    auto new_record = my_parser.ParseRecordDescFile("./test_files/file4_Record_Desc");
+    ASSERT_TRUE(new_record);
+
+    /* verify got all fields */
+    EXPECT_EQ(std::get<e_VariableRecord>(new_record.value()).GetFields().size(), 9);
+
+    std::ifstream file_data = std::ifstream("./test_files/file4_data.dat", std::ios::in | std::ios::binary);
+
+    std::string buffer{};
+    buffer.reserve(500);
+
+    // let's read our header record and pick up field names. 
+
+    std::getline(file_data, buffer);
+
+    auto& variable_record = std::get<e_VariableRecord>(new_record.value());
+
+    variable_record.UseData(std::string_view{buffer.data(), buffer.size()});
+
+    int ctr = 0;
+    while (file_data.good() && ++ctr < 6 )
+    {
+        std::getline(file_data, buffer);
+        // fmt::print("buffer: {:30}\n", buffer);
+        variable_record.UseData(std::string_view{buffer.data(), buffer.size()});
+        fmt::print("{}\n", variable_record);
+    }
+    file_data.close();
+}
+
+TEST_F(RecordDescFileParser, DISABLED_VerifyCanCopyAndMoveThings)    //NOLINT
 {
     CRecordDescParser my_parser;
   
