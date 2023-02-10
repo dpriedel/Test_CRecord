@@ -1,11 +1,11 @@
-# This file is part of Extractor_Markup.
+# This file is part of ModernCRecord.
 
-# Extractor_Markup is free software: you can redistribute it and/or modify
+# ModernCRecord is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Extractor_Markup is distributed in the hope that it will be useful,
+# ModernCRecord is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -22,9 +22,7 @@ MAKE=gmake
 BOOSTDIR := /extra/boost/boost-1.80_gcc-12
 GCCDIR := /extra/gcc/gcc-12
 GTESTDIR := /usr/local/include
-DECIMALSRCDIR := /extra/gcc/decNumber_old
-# DECIMALSRCDIR := /extra/gcc/libdecnumber
-UTILITYDIR := ${HOME}/projects/PF_Project/common_utilities
+UTILITYDIR := ${HOME}/projects/ModernCRecord/common_utilities
 CPP := $(GCCDIR)/bin/g++
 GCC := $(GCCDIR)/bin/gcc
 
@@ -37,51 +35,47 @@ endif
 
 OUTFILE := EndToEnd_Test
 
-CFG_INC := -I${HOME}/projects/PF_Project/point_figure/src \
+CFG_INC := -I${HOME}/projects/ModernCRecord/CRecord/src \
 	-I$(GTESTDIR) \
 	-I$(BOOSTDIR) \
 	-I$(DECIMALSRCDIR) \
-	-I$(UTILITYDIR)/include \
-	-I/usr/local/Python_DPR/include/python3.11 \
-	-I/usr/local/Python_DPR/lib/python3.11/site-packages/pybind11/include
-	# -I/usr/include/python3.10 \
-	# -I/usr/lib/python3.10/site-packages/pybind11/include
+	-I$(UTILITYDIR)/include
 
 RPATH_LIB := -Wl,-rpath,$(GCCDIR)/lib64 -Wl,-rpath,$(BOOSTDIR)/lib -Wl,-rpath,/usr/local/lib
 
 SDIR1 := .
 SRCS1 := $(SDIR1)/EndToEnd_Test.cpp
 
-SDIR2 := ../point_figure/src
-SRCS2 := $(SDIR2)/PF_CollectDataApp.cpp  \
-		$(SDIR2)/DDecQuad.cpp  \
-		$(SDIR2)/Boxes.cpp \
-		$(SDIR2)/PF_Column.cpp \
-		$(SDIR2)/PF_Chart.cpp \
-		$(SDIR2)/PointAndFigureDB.cpp \
-		$(SDIR2)/PF_Signals.cpp  \
-		$(SDIR2)/Tiingo.cpp #\
-#		$(SDIR2)/PathNameGenerator.cpp \
-#		$(SDIR2)/DailyIndexFileRetriever.cpp \
-#		$(SDIR2)/FormFileRetriever.cpp
+# SDIR2 := ../point_figure/src
+# SRCS2 := $(SDIR2)/PF_CollectDataApp.cpp  \
+# 		$(SDIR2)/DDecQuad.cpp  \
+# 		$(SDIR2)/Boxes.cpp \
+# 		$(SDIR2)/PF_Column.cpp \
+# 		$(SDIR2)/PF_Chart.cpp \
+# 		$(SDIR2)/PointAndFigureDB.cpp \
+# 		$(SDIR2)/PF_Signals.cpp  \
+# 		$(SDIR2)/Tiingo.cpp #\
+# #		$(SDIR2)/PathNameGenerator.cpp \
+# #		$(SDIR2)/DailyIndexFileRetriever.cpp \
+# #		$(SDIR2)/FormFileRetriever.cpp
+#
+# SDIR3 := $(DECIMALSRCDIR)
+# SRCS3 := $(SDIR3)/decQuad.c \
+# 		 $(SDIR3)/decNumber.c \
+# 		 $(SDIR3)/decContext.c
+#
+# # SDIR3a := $(DECIMALSRCDIR)/bid
+# SDIR3a := $(DECIMALSRCDIR)
+# SRCS3a := $(SDIR3a)/decimal128.c \
+# 		  $(SDIR3a)/decimal64.c
+#
+# SDIR4 := $(UTILITYDIR)/src
+# SRCS4 := $(SDIR4)/utilities.cpp \
+# 		 $(SDIR4)/calfaq.c
 
-SDIR3 := $(DECIMALSRCDIR)
-SRCS3 := $(SDIR3)/decQuad.c \
-		 $(SDIR3)/decNumber.c \
-		 $(SDIR3)/decContext.c
+SRCS := $(SRCS1) # $(SRCS2) $(SRCS3) $(SRCS3a) $(SRCS4)
 
-# SDIR3a := $(DECIMALSRCDIR)/bid
-SDIR3a := $(DECIMALSRCDIR)
-SRCS3a := $(SDIR3a)/decimal128.c \
-		  $(SDIR3a)/decimal64.c
-
-SDIR4 := $(UTILITYDIR)/src
-SRCS4 := $(SDIR4)/utilities.cpp \
-		 $(SDIR4)/calfaq.c
-
-SRCS := $(SRCS1) $(SRCS2) $(SRCS3) $(SRCS3a) $(SRCS4)
-
-VPATH := $(SDIR1):$(SDIR2):$(SDIR3):$(SDIR3a):$(SDIR4)
+VPATH := $(SDIR1)#:$(SDIR2):$(SDIR3):$(SDIR3a):$(SDIR4)
 
 
 #
@@ -98,29 +92,22 @@ OUTDIR=Debug_e2e
 CFG_LIB := -L/usr/local/lib \
 		-lgtest -lgtest_main \
 		-ldate-tz \
-		-lpqxx \
-		-lpq \
+		-L/${HOME}/projects/ModernCRecord/libCRecord \
+		-lCRecord \
 		-L/usr/lib \
 		-lfmt \
 		-lspdlog \
-		-lcrypt \
 		-lpthread \
-		-lssl -lcrypto \
-		-ljsoncpp \
-		-L$(GCCDIR)/lib64 \
 		-L$(BOOSTDIR)/lib \
-		-lboost_program_options-mt-x64 \
-		-L/usr/local/Python_DPR/lib \
-		-ldl -lutil -lm -lm \
-		-lpython3.11
+		-L$(GCCDIR)/lib64
 
 OBJS1=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS1)))))
-OBJS2=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS2)))))
-OBJS3=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS3)))))
-OBJS3a=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS3a)))))
-OBJS4=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS4)))))
+# OBJS2=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS2)))))
+# OBJS3=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS3)))))
+# OBJS3a=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS3a)))))
+# OBJS4=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS4)))))
 
-OBJS=$(OBJS1) $(OBJS2) $(OBJS3) $(OBJS3a) $(OBJS4)
+OBJS=$(OBJS1) # $(OBJS2) $(OBJS3) $(OBJS3a) $(OBJS4)
 
 DEPS=$(OBJS:.o=.d)
 
@@ -140,7 +127,7 @@ $(OUTDIR)/%.o : %.cpp
 $(OUTDIR)/%.o : %.c
 	$(CCOMPILE)
 
-$(OUTFILE): $(OUTDIR) $(OBJS1) $(OBJS2) $(OBJS3) $(OBJS3a) $(OBJS4)
+$(OUTFILE): $(OUTDIR) $(OBJS1)# $(OBJS2) $(OBJS3) $(OBJS3a) $(OBJS4)
 	$(LINK)
 
 -include $(DEPS)
