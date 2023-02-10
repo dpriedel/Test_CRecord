@@ -3,3 +3,8 @@
 Debug_unit
 Unit_Test
 test_files
+
+Debug_e2e
+EndToEnd_Test
+
+set_paths.vim
