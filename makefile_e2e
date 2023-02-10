@@ -98,6 +98,7 @@ CFG_LIB := -L/usr/local/lib \
 		-lfmt \
 		-lspdlog \
 		-lpthread \
+		-lantlr4-runtime \
 		-L$(BOOSTDIR)/lib \
 		-L$(GCCDIR)/lib64
 

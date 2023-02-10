@@ -41,6 +41,7 @@
 #include <gmock/gmock.h>
 
 #include "CRecord.h"
+#include "CRecordDescParser.h"
 
 namespace fs = std::filesystem;
 
@@ -58,8 +59,17 @@ class TestInstantiateCRecord : public Test
 TEST_F(TestInstantiateCRecord, UseLibraryVersionForFixedRecord)    //NOLINT
 {
 	try
-	{
-	}
+    {
+        CRecordDescParser my_parser;
+
+        auto new_record = my_parser.ParseRecordDescFile("./test_files/file1_Record_Desc");
+        ASSERT_TRUE(new_record);
+
+        // verify new record type is FixedRecord
+        ASSERT_EQ(new_record.value().index(), e_FixedRecord);
+        // test accessing a property
+        ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetBufferLen(), 159);
+    }
 
     // catch any problems trying to setup application
 
