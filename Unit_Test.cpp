@@ -190,6 +190,22 @@ TEST_F(RecordDescFileParser, VerifyCanMapVariableDataRecord)    //NOLINT
     file_data.close();
 }
 
+TEST_F(RecordDescFileParser, VerifyCanCreateFixedRecordWithArrayField)    //NOLINT
+{
+    CRecordDescParser my_parser;
+  
+    auto new_record = my_parser.ParseRecordDescFile("./test_files/file6_Record_Desc");
+    ASSERT_TRUE(new_record);
+
+    // verify new record type is FixedRecord
+    EXPECT_EQ(new_record.value().index(), e_FixedRecord);
+    // test accessing a property
+    ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetBufferLen(), 179);
+    //
+    // auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
+    // ranges::for_each(fixed_record.GetFields(), [](const auto& fld) { fmt::print("{}\n", fld); });
+};
+
 TEST_F(RecordDescFileParser, DISABLED_VerifyCanCopyAndMoveThings)    //NOLINT
 {
     CRecordDescParser my_parser;
@@ -221,6 +237,48 @@ TEST_F(RecordDescFileParser, DISABLED_VerifyCanCopyAndMoveThings)    //NOLINT
     //     fmt::print("{}\n", fixed_record);
     // }
     // file_data.close();
+};
+
+class ArrayField : public Test
+{
+
+};
+
+TEST_F(ArrayField, TestFieldAccess)    //NOLINT
+{
+    CRecordDescParser my_parser;
+  
+    auto new_record = my_parser.ParseRecordDescFile("./test_files/mortality_2019_RecordDesc");
+    EXPECT_TRUE(new_record);
+
+    auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
+
+    fmt::print("{}\n", fixed_record);
+
+    // let's access some data and verify we can see it in our array field
+
+    std::ifstream file_data = std::ifstream("./test_files/file7_data.dat", std::ios::in | std::ios::binary);
+
+    std::string buffer;
+    buffer.reserve(fixed_record.GetBufferLen() + 100);
+
+    int ctr = 0;
+    while (std::getline(file_data, buffer))
+    {
+        ++ctr;
+        // fmt::print("buffer: ->{}<-\n", std::string_view{buffer.data(), 50});
+        fixed_record.UseData(std::string_view{buffer.data(), buffer.size()});
+        fmt::print("{}: {}\n", ctr, fixed_record);
+
+        // try to access our array field.
+
+        const auto& conditions = fixed_record.GetField<CArrayField>("Conditions");
+
+        ranges::for_each(conditions.GetArray(), [](const auto& cond) { fmt::print ("cond: {}<-\n", cond); });
+
+        EXPECT_EQ(conditions.GetArray().size(), fixed_record.ConvertFieldToNumber<size_t>("MultipleConditionCount"));
+    }
+    file_data.close();
 };
 
 // class Timer : public Test
