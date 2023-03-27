@@ -52,6 +52,7 @@
 #include <range/v3/algorithm/for_each.hpp>
 #include <range/v3/view/chunk_by.hpp>
 #include <range/v3/view/sliding.hpp>
+#include <range/v3/view/take.hpp>
 
 #include <gmock/gmock.h>
 
@@ -207,7 +208,6 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
                 return false;
             });
 
-
         std::vector<Obv_Data> obv_history;
         obv_history.reserve(stock_data_history.size());
 
@@ -237,7 +237,8 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
             }
         }
 
-        ranges::for_each(obv_history, [](const Obv_Data& val) { std::cout << "symbol: " << val.symbol_.data() << ". date: " << val.date_ << ".  obv: " << val.obv_ << '\n'; });
+        ranges::for_each(obv_history | ranges::views::take(50), [](const Obv_Data& val)
+                         { std::cout << "symbol: " << val.symbol_.data() << ". date: " << val.date_ << ".  obv: " << val.obv_ << '\n'; });
     }
 
     // catch any problems trying to setup application
