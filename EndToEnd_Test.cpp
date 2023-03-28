@@ -168,7 +168,7 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
             new_data.high_ = stock_data_record.ConvertFieldToNumber<float_t>("High");
             new_data.low_ = stock_data_record.ConvertFieldToNumber<float_t>("Low");
             new_data.close_ = stock_data_record.ConvertFieldToNumber<float_t>("Close");
-            new_data.volume_ = stock_data_record.ConvertFieldToNumber<float_t>("Volume");
+            new_data.volume_ = stock_data_record.ConvertFieldToNumber<int32_t>("Volume");
 
             stock_data_history.push_back(new_data);
             // fmt::print("{}\n", stock_data_record);
