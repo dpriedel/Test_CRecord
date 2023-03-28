@@ -157,13 +157,6 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
 
         std::vector<StockData> stock_data_history;
         
-        auto to_number = [](std::string_view in_value, auto& out_value) {
-            auto [ptr, ec] { std::from_chars(in_value.begin(), in_value.end(), out_value) };
-            if (ec != std::errc())
-            {
-                throw std::invalid_argument{fmt::format("Unable to convert input->{}<- to a number.", in_value)};
-            }
-        };
         while (std::getline(file_data, buffer))
         {
             stock_data_record.UseData(std::string_view{buffer.data(), buffer.size()});
@@ -171,11 +164,11 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
             new_data.symbol_.fill('\0');
             stock_data_record["Code"].copy(new_data.symbol_.data(), new_data.symbol_.size() - 1);
             new_data.date_ = StringToDateYMD("%Y-%m-%d", stock_data_record["Date"]);
-            to_number(stock_data_record["Open"], new_data.open_);
-            to_number(stock_data_record["High"], new_data.high_);
-            to_number(stock_data_record["Low"], new_data.low_);
-            to_number(stock_data_record["Close"], new_data.close_);
-            to_number(stock_data_record["Volume"], new_data.volume_);
+            new_data.open_ = stock_data_record.ConvertFieldToNumber<float_t>("Open");
+            new_data.high_ = stock_data_record.ConvertFieldToNumber<float_t>("High");
+            new_data.low_ = stock_data_record.ConvertFieldToNumber<float_t>("Low");
+            new_data.close_ = stock_data_record.ConvertFieldToNumber<float_t>("Close");
+            new_data.volume_ = stock_data_record.ConvertFieldToNumber<float_t>("Volume");
 
             stock_data_history.push_back(new_data);
             // fmt::print("{}\n", stock_data_record);
