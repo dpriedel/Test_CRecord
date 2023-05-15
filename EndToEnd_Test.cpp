@@ -23,15 +23,22 @@
 //  Description:
 // =====================================================================================
 
+#include <algorithm>
 #include <array>
 #include <charconv>
+#include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
-#include <fmt/core.h>
+#include <format>
 #include <fstream>
+#include <ranges>
 #include <vector>
 
+namespace rng = std::ranges;
+namespace vws = std::ranges::views;
+
+// #include <fmt/core.h>
 // #include <future>
 //
 // #include <range/v3/algorithm/for_each.hpp>
@@ -40,19 +47,19 @@
 // #include <range/v3/algorithm/equal.hpp>
 // #include <range/v3/algorithm/find_if.hpp>
 
-#include <date/date.h>
+// #include <date/date.h>
 #include <date/chrono_io.h>
 
-#include <fmt/format.h>
+// #include <fmt/format.h>
 
 #include <gtest/gtest.h>
 #include <spdlog/spdlog.h>
 
-#include <range/v3/action/sort.hpp>
-#include <range/v3/algorithm/for_each.hpp>
-#include <range/v3/view/chunk_by.hpp>
-#include <range/v3/view/sliding.hpp>
-#include <range/v3/view/take.hpp>
+// #include <range/v3/action/sort.hpp>
+// #include <range/v3/algorithm/for_each.hpp>
+// #include <range/v3/view/chunk_by.hpp>
+// #include <range/v3/view/sliding.hpp>
+// #include <range/v3/view/take.hpp>
 
 #include <gmock/gmock.h>
 
@@ -74,13 +81,14 @@ std::shared_ptr<spdlog::logger> DEFAULT_LOGGER;
 //  Description:  
 // =====================================================================================
 
-date::year_month_day StringToDateYMD(std::string_view input_format, std::string_view the_date)
+std::chrono::year_month_day StringToDateYMD(std::string_view input_format, std::string_view the_date)
 {
     std::istringstream in{the_date.data()};
     date::year_month_day result{};
     date::from_stream(in, input_format.data(), result);
-    BOOST_ASSERT_MSG(! in.fail() && ! in.bad(), fmt::format("Unable to parse given date: {}", the_date).c_str());
-    return result;
+    BOOST_ASSERT_MSG(! in.fail() && ! in.bad(), std::format("Unable to parse given date: {}", the_date).c_str());
+    std::chrono::year_month_day result1(std::chrono::year{result.year().operator int()}, std::chrono::month{result.month().operator unsigned()}, std::chrono::day{result.day().operator unsigned()});
+    return result1;
 }		// -----  end of method StringToDateYMD  ----- 
 
 class TestInstantiateCRecord : public Test
@@ -106,7 +114,7 @@ TEST_F(TestInstantiateCRecord, VerifyCompileLinkRunUsinglibCRecord)    //NOLINT
 
 	catch (const std::exception& theProblem)
 	{
-        spdlog::error(fmt::format("Something fundamental went wrong: {}", theProblem.what()));
+        spdlog::error(std::format("Something fundamental went wrong: {}", theProblem.what()));
 	}
 	catch (...)
 	{		// handle exception: unspecified
@@ -119,7 +127,7 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
     struct StockData
     {
         std::array<char, 10> symbol_ = {};
-        date::year_month_day date_ = {};
+        std::chrono::year_month_day date_ = {};
         float_t open_ = 0.0;
         float_t high_ = 0.0;
         float_t low_ = 0.0;
@@ -127,7 +135,7 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
         int32_t volume_ = 0;
     };
 
-    // fmt::print("empty StockData: {}\n", StockData{});
+    // std::print("empty StockData: {}\n", StockData{});
 
 	try
     {
@@ -171,7 +179,7 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
             new_data.volume_ = stock_data_record.ConvertFieldToNumber<int32_t>("Volume");
 
             stock_data_history.push_back(new_data);
-            // fmt::print("{}\n", stock_data_record);
+            // std::print("{}\n", stock_data_record);
         }
         file_data.close();
 
@@ -184,32 +192,32 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
         struct Obv_Data
         {
             std::array<char, 10> symbol_ = {};
-            date::year_month_day date_ = {};
+            std::chrono::year_month_day date_ = {};
             int64_t obv_ = 0;
         };
         
-        stock_data_history |= ranges::actions::sort([](const auto& a, const auto& b)
-            {
-                if (a.symbol_ < b.symbol_)
-                {
-                    return true;
-                } 
-                if (a.symbol_ == b.symbol_)
-                {
-                    return a.date_ < b.date_;
-                }
-                return false;
-            });
+        rng::sort(stock_data_history, [](const auto& a, const auto& b)
+          {
+              if (a.symbol_ < b.symbol_)
+              {
+                  return true;
+              } 
+              if (a.symbol_ == b.symbol_)
+              {
+                  return a.date_ < b.date_;
+              }
+              return false;
+          });
 
         std::vector<Obv_Data> obv_history;
         obv_history.reserve(stock_data_history.size());
 
-        auto each_symbol = ranges::views::chunk_by([](const auto&a, const auto& b) { return a.symbol_ == b.symbol_; });
+        auto each_symbol = vws::chunk_by([](const auto&a, const auto& b) { return a.symbol_ == b.symbol_; });
         for (const auto& stock_days : stock_data_history | each_symbol)
         {
             int64_t prev_obv = 0;
             int64_t obv = 0;
-            for (const auto vals: stock_days | ranges::views::sliding(2))
+            for (const auto vals: stock_days | vws::slide(2))
             {
                 if (vals[1].close_ > vals[0].close_)
                 {
@@ -230,7 +238,7 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
             }
         }
 
-        ranges::for_each(obv_history | ranges::views::take(50), [](const Obv_Data& val)
+        rng::for_each(obv_history | vws::take(50), [](const Obv_Data& val)
                          { std::cout << "symbol: " << val.symbol_.data() << ". date: " << val.date_ << ".  obv: " << val.obv_ << '\n'; });
     }
 
@@ -238,7 +246,7 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
 
 	catch (const std::exception& theProblem)
 	{
-        spdlog::error(fmt::format("Something fundamental went wrong: {}", theProblem.what()));
+        spdlog::error(std::format("Something fundamental went wrong: {}", theProblem.what()));
 	}
 	catch (...)
 	{		// handle exception: unspecified

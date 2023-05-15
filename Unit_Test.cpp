@@ -30,26 +30,33 @@
     /* along with Extractor_Markup.  If not, see <http://www.gnu.org/licenses/>. */
 
 
-#include <fmt/core.h>
+// #include <fmt/core.h>
+#include <algorithm>
+#include <chrono>
+#include <format>
 #include <fstream>
+#include <ranges>
+
+namespace rng = std::ranges;
+namespace vws = std::ranges::views;
 
 /* #include <gmock/gmock.h> */
 #include <gtest/gtest.h>
 
-#include <date/date.h>
+// #include <date/date.h>
 #include <spdlog/spdlog.h>
-#include <fmt/format.h>
-#include <fmt/chrono.h>
-#include <fmt/ranges.h>
-
-#include <range/v3/algorithm/for_each.hpp>
-#include <range/v3/algorithm/for_each_n.hpp>
-#include <range/v3/view/take.hpp>
+// #include <fmt/format.h>
+// #include <fmt/chrono.h>
+// #include <fmt/ranges.h>
+//
+// #include <range/v3/algorithm/for_each.hpp>
+// #include <range/v3/algorithm/for_each_n.hpp>
+// #include <range/v3/view/take.hpp>
 #include <string>
 
 
 using namespace std::literals::chrono_literals;
-using namespace date::literals;
+// using namespace std::chrono::literals;
 using namespace std::string_literals;
 namespace fs = std::filesystem;
 
@@ -149,9 +156,9 @@ TEST_F(RecordDescFileParser, VerifyCanMapFixedDataRecord)    //NOLINT
     while (file_data.good() /* && ++ctr < 6 */)
     {
         std::getline(file_data, buffer);
-        // fmt::print("buffer: {:30}\n", buffer);
+        // std::cout << std::format("buffer: {:30}\n", buffer);
         fixed_record.UseData(std::string_view{buffer.data(), buffer.size()});
-        // fmt::print("{}\n", fixed_record);
+        // std::cout << std::format("{}\n", fixed_record);
     }
     file_data.close();
 }
@@ -183,9 +190,9 @@ TEST_F(RecordDescFileParser, VerifyCanMapVariableDataRecord)    //NOLINT
     while (file_data.good() && ++ctr < 6 )
     {
         std::getline(file_data, buffer);
-        // fmt::print("buffer: {:30}\n", buffer);
+        // std::cout << std::format("buffer: {:30}\n", buffer);
         variable_record.UseData(std::string_view{buffer.data(), buffer.size()});
-        fmt::print("{}\n", variable_record);
+        std::cout << std::format("{}\n", variable_record);
     }
     file_data.close();
 }
@@ -203,7 +210,7 @@ TEST_F(RecordDescFileParser, VerifyCanCreateFixedRecordWithArrayField)    //NOLI
     ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetBufferLen(), 179);
     //
     // auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
-    // ranges::for_each(fixed_record.GetFields(), [](const auto& fld) { fmt::print("{}\n", fld); });
+    // rng::for_each(fixed_record.GetFields(), [](const auto& fld) { std::cout << std::format("{}\n", fld); });
 };
 
 TEST_F(RecordDescFileParser, DISABLED_VerifyCanCopyAndMoveThings)    //NOLINT
@@ -232,9 +239,9 @@ TEST_F(RecordDescFileParser, DISABLED_VerifyCanCopyAndMoveThings)    //NOLINT
     // while (file_data.good() && ++ctr < 6)
     // {
     //     file_data.getline(buffer.data(), buffer.capacity());
-    //     // fmt::print("buffer: {:30}\n", buffer);
+    //     // std::cout << std::format("buffer: {:30}\n", buffer);
     //     fixed_record.UseData(std::string_view{buffer.data(), buffer.size()});
-    //     fmt::print("{}\n", fixed_record);
+    //     std::cout << std::format("{}\n", fixed_record);
     // }
     // file_data.close();
 };
@@ -253,7 +260,7 @@ TEST_F(ArrayField, TestFieldAccess)    //NOLINT
 
     auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
 
-    fmt::print("{}\n", fixed_record);
+    std::cout << std::format("{}\n", fixed_record);
 
     // let's access some data and verify we can see it in our array field
 
@@ -266,15 +273,15 @@ TEST_F(ArrayField, TestFieldAccess)    //NOLINT
     while (std::getline(file_data, buffer))
     {
         ++ctr;
-        // fmt::print("buffer: ->{}<-\n", std::string_view{buffer.data(), 50});
+        // std::cout << std::format("buffer: ->{}<-\n", std::string_view{buffer.data(), 50});
         fixed_record.UseData(std::string_view{buffer.data(), buffer.size()});
-        fmt::print("{}: {}\n", ctr, fixed_record);
+        std::cout << std::format("{}: {}\n", ctr, fixed_record);
 
         // try to access our array field.
 
         const auto& conditions = fixed_record.GetField<CArrayField>("Conditions");
 
-        ranges::for_each(conditions.GetArray(), [](const auto& cond) { fmt::print ("cond: {}<-\n", cond); });
+        rng::for_each(conditions.GetArray(), [](const auto& cond) { std::cout << std::format ("cond: {}<-\n", cond); });
 
         EXPECT_EQ(conditions.GetArray().size(), fixed_record.ConvertFieldToNumber<size_t>("MultipleConditionCount"));
     }
