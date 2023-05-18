@@ -27,36 +27,25 @@
     /* GNU General Public License for more details. */
 
     /* You should have received a copy of the GNU General Public License */
-    /* along with Extractor_Markup.  If not, see <http://www.gnu.org/licenses/>. */
+    /* along with ModernCRecord.  If not, see <http://www.gnu.org/licenses/>. */
 
 
-// #include <fmt/core.h>
 #include <algorithm>
 #include <chrono>
 #include <format>
 #include <fstream>
 #include <ranges>
+#include <string>
 
 namespace rng = std::ranges;
 namespace vws = std::ranges::views;
 
-/* #include <gmock/gmock.h> */
 #include <gtest/gtest.h>
 
-// #include <date/date.h>
 #include <spdlog/spdlog.h>
-// #include <fmt/format.h>
-// #include <fmt/chrono.h>
-// #include <fmt/ranges.h>
-//
-// #include <range/v3/algorithm/for_each.hpp>
-// #include <range/v3/algorithm/for_each_n.hpp>
-// #include <range/v3/view/take.hpp>
-#include <string>
 
 
 using namespace std::literals::chrono_literals;
-// using namespace std::chrono::literals;
 using namespace std::string_literals;
 namespace fs = std::filesystem;
 

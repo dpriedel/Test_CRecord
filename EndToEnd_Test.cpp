@@ -38,28 +38,10 @@
 namespace rng = std::ranges;
 namespace vws = std::ranges::views;
 
-// #include <fmt/core.h>
-// #include <future>
-//
-// #include <range/v3/algorithm/for_each.hpp>
-//
-// #include <range/v3/view/drop.hpp>
-// #include <range/v3/algorithm/equal.hpp>
-// #include <range/v3/algorithm/find_if.hpp>
-
-// #include <date/date.h>
 #include <date/chrono_io.h>
-
-// #include <fmt/format.h>
 
 #include <gtest/gtest.h>
 #include <spdlog/spdlog.h>
-
-// #include <range/v3/action/sort.hpp>
-// #include <range/v3/algorithm/for_each.hpp>
-// #include <range/v3/view/chunk_by.hpp>
-// #include <range/v3/view/sliding.hpp>
-// #include <range/v3/view/take.hpp>
 
 #include <gmock/gmock.h>
 

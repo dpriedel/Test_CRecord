@@ -11,7 +11,7 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Extractor_Markup.  If not, see <http://www.gnu.org/licenses/>.
+# along with ModernCRecord.  If not, see <http://www.gnu.org/licenses/>.
 
 # see link below for make file dependency magic
 #
@@ -45,40 +45,12 @@ RPATH_LIB := -Wl,-rpath,$(GCCDIR)/lib64 -Wl,-rpath,$(BOOSTDIR)/lib -Wl,-rpath,/u
 SDIR1 := .
 SRCS1 := $(SDIR1)/EndToEnd_Test.cpp
 
-# SDIR2 := ../point_figure/src
-# SRCS2 := $(SDIR2)/PF_CollectDataApp.cpp  \
-# 		$(SDIR2)/DDecQuad.cpp  \
-# 		$(SDIR2)/Boxes.cpp \
-# 		$(SDIR2)/PF_Column.cpp \
-# 		$(SDIR2)/PF_Chart.cpp \
-# 		$(SDIR2)/PointAndFigureDB.cpp \
-# 		$(SDIR2)/PF_Signals.cpp  \
-# 		$(SDIR2)/Tiingo.cpp #\
-# #		$(SDIR2)/PathNameGenerator.cpp \
-# #		$(SDIR2)/DailyIndexFileRetriever.cpp \
-# #		$(SDIR2)/FormFileRetriever.cpp
-#
-# SDIR3 := $(DECIMALSRCDIR)
-# SRCS3 := $(SDIR3)/decQuad.c \
-# 		 $(SDIR3)/decNumber.c \
-# 		 $(SDIR3)/decContext.c
-#
 SDIR3a := $(UTILITYDIR)/src
 SRCS3a := $(SDIR3a)/utilities.cpp
-
-# # SDIR3a := $(DECIMALSRCDIR)/bid
-# SDIR3a := $(DECIMALSRCDIR)
-# SRCS3a := $(SDIR3a)/decimal128.c \
-# 		  $(SDIR3a)/decimal64.c
-#
-# SDIR4 := $(UTILITYDIR)/src
-# SRCS4 := $(SDIR4)/utilities.cpp \
-# 		 $(SDIR4)/calfaq.c
 
 SRCS := $(SRCS1) $(SRCS3a)
 
 VPATH := $(SDIR1):$(SDIR3a)
-
 
 #
 # Configuration: Debug
@@ -87,10 +59,6 @@ ifeq "$(CFG)" "Debug"
 
 OUTDIR=Debug_e2e
 
-# for embedding Python, get the appropriate link flags
-# python3-config --ldflags
-# -L/usr/lib  -lcrypt -lpthread -ldl  -lutil -lm -lm
-#
 CFG_LIB := -L/usr/local/lib \
 		-lgtest -lgtest_main \
 		-ldate-tz \
@@ -105,16 +73,13 @@ CFG_LIB := -L/usr/local/lib \
 		-L$(GCCDIR)/lib64
 
 OBJS1=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS1)))))
-# OBJS2=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS2)))))
-# OBJS3=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS3)))))
 OBJS3a=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS3a)))))
-# OBJS4=$(addprefix $(OUTDIR)/, $(addsuffix .o, $(basename $(notdir $(SRCS4)))))
 
 OBJS=$(OBJS1) $(OBJS3a)
 
 DEPS=$(OBJS:.o=.d)
 
-COMPILE=$(CPP) -c  -x c++  -O0  -g3 -std=c++2b -D_DEBUG -DBOOST_ENABLE_ASSERT_HANDLER -DBOOST_REGEX_STANDALONE -DUSE_OS_TZDB -fPIC -o $@ $(CFG_INC) $< -march=native -MMD -MP
+COMPILE=$(CPP) -c  -x c++  -O0 -ggdb -g3 -std=c++2b -D_DEBUG -DBOOST_ENABLE_ASSERT_HANDLER -DBOOST_REGEX_STANDALONE -DUSE_OS_TZDB -fPIC -o $@ $(CFG_INC) $< -march=native -MMD -MP
 CCOMPILE=$(GCC) -c  -O0  -g3 -D_DEBUG -fPIC -o $@ $(CFG_INC) $< -march=native -MMD -MP
 
 LINK := $(CPP)  -g -o $(OUTFILE) $(OBJS) $(CFG_LIB) -Wl,-E $(RPATH_LIB)

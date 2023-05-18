@@ -11,7 +11,7 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Extractor_Markup.  If not, see <http://www.gnu.org/licenses/>.
+# along with ModernCRecord.  If not, see <http://www.gnu.org/licenses/>.
 
 # see link below for make file dependency magic
 #
@@ -97,7 +97,7 @@ OBJS=$(OBJS1) $(OBJS2) $(OBJS3) $(OBJS3a) #$(OBJS4)
 
 DEPS=$(OBJS:.o=.d)
 
-COMPILE=$(CPP) -c  -x c++  -O0  -g3 -std=c++2b -DBOOST_ENABLE_ASSERT_HANDLER -D_DEBUG -DBOOST_REGEX_STANDALONE -DUSE_OS_TZDB  -fPIC -o $@ $(CFG_INC) $< -march=native -MMD -MP
+COMPILE=$(CPP) -c  -x c++  -O0 -ggdb -g3 -std=c++2b -DBOOST_ENABLE_ASSERT_HANDLER -D_DEBUG -DBOOST_REGEX_STANDALONE -DUSE_OS_TZDB  -fPIC -o $@ $(CFG_INC) $< -march=native -MMD -MP
 
 LINK := $(CPP)  -g -o $(OUTFILE) $(OBJS) $(CFG_LIB) -Wl,-E $(RPATH_LIB) 
 
