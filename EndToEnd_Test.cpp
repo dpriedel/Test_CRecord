@@ -97,9 +97,7 @@ TEST_F(TestInstantiateCRecord, VerifyCompileLinkRunUsinglibCRecord)    //NOLINT
 {
 	try
     {
-        CRecordDescParser my_parser;
-
-        auto new_record = my_parser.ParseRecordDescFile("./test_files/file1_Record_Desc");
+        auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/file1_Record_Desc");
         ASSERT_TRUE(new_record);
 
         // verify new record type is FixedRecord
@@ -137,12 +135,10 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)    //NOLINT
 
 	try
     {
-        CRecordDescParser my_parser;
-    
         // use some simple daily stock data...
         // TODO: need a file with multiple symbols for multiple days !
 
-        auto new_record = my_parser.ParseRecordDescFile("./test_files/file4_Record_Desc");
+        auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/file4_Record_Desc");
         ASSERT_TRUE(new_record);
 
         auto& stock_data_record = std::get<e_VariableRecord>(new_record.value());
