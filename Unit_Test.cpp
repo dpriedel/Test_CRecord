@@ -70,55 +70,53 @@ TEST_F(RecordDescFileParser, VerifyThrowsIfInputFileNotFound)  // NOLINT
 TEST_F(RecordDescFileParser, VerifyCanCreateFixedRecord)  // NOLINT
 {
     auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/file1_Record_Desc");
-    ASSERT_TRUE(new_record);
 
     // verify new record type is FixedRecord
-    ASSERT_EQ(new_record.value().index(), e_FixedRecord);
+    ASSERT_EQ(new_record.index(), RecordTypes::e_FixedRecord);
     // test accessing a property
-    ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetBufferLen(), 159);
+    ASSERT_EQ(std::get<RecordTypes::e_FixedRecord>(new_record).GetBufferLen(), 159);
 };
 
 TEST_F(RecordDescFileParser, VerifyCanCreateVariableRecord)  // NOLINT
 {
     auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/file3_Record_Desc");
-    ASSERT_TRUE(new_record);
 
     // verify new record type is FixedRecord
-    ASSERT_EQ(new_record.value().index(), e_VariableRecord);
+    ASSERT_EQ(new_record.index(), RecordTypes::e_VariableRecord);
     // test accessing a property
-    ASSERT_EQ(std::get<e_VariableRecord>(new_record.value()).GetFieldCount(), 47);
+    ASSERT_EQ(std::get<RecordTypes::e_VariableRecord>(new_record).GetFieldCount(), 47);
 };
 
 TEST_F(RecordDescFileParser, VerifyCanAddAllFixedRecordFields)  // NOLINT
 {
     auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/file1_Record_Desc");
-    ASSERT_TRUE(new_record);
+    EXPECT_EQ(new_record.index(), RecordTypes::e_FixedRecord);
 
     // verify got all fields
-    ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetFields().size(), 9);
+    ASSERT_EQ(std::get<RecordTypes::e_FixedRecord>(new_record).GetFields().size(), 9);
 };
 
 TEST_F(RecordDescFileParser, VerifyCanAddAllVariableRecordFields)  // NOLINT
 {
     auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/file3_Record_Desc");
-    ASSERT_TRUE(new_record);
+    EXPECT_EQ(new_record.index(), RecordTypes::e_VariableRecord);
 
     // verify got all fields
     // NOTE: test file has 1 SYNTH field so count is 48.
-    ASSERT_EQ(std::get<e_VariableRecord>(new_record.value()).GetFields().size(), 48);
+    ASSERT_EQ(std::get<RecordTypes::e_VariableRecord>(new_record).GetFields().size(), 48);
 };
 
 TEST_F(RecordDescFileParser, VerifyCanMapFixedDataRecord)  // NOLINT
 {
     auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/file2_Record_Desc");
-    ASSERT_TRUE(new_record);
+    EXPECT_EQ(new_record.index(), RecordTypes::e_FixedRecord);
 
     // verify got all fields
-    EXPECT_EQ(std::get<e_FixedRecord>(new_record.value()).GetFields().size(), 86);
+    EXPECT_EQ(std::get<RecordTypes::e_FixedRecord>(new_record).GetFields().size(), 86);
 
     std::ifstream file_data = std::ifstream("./test_files/file2_data.dat", std::ios::in | std::ios::binary);
 
-    auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
+    auto& fixed_record = std::get<RecordTypes::e_FixedRecord>(new_record);
 
     std::string buffer;
     buffer.reserve(fixed_record.GetBufferLen() + 100);
@@ -137,10 +135,10 @@ TEST_F(RecordDescFileParser, VerifyCanMapFixedDataRecord)  // NOLINT
 TEST_F(RecordDescFileParser, VerifyCanMapVariableDataRecord)  // NOLINT
 {
     auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/file4_Record_Desc");
-    ASSERT_TRUE(new_record);
+    EXPECT_EQ(new_record.index(), RecordTypes::e_VariableRecord);
 
     /* verify got all fields */
-    EXPECT_EQ(std::get<e_VariableRecord>(new_record.value()).GetFields().size(), 9);
+    EXPECT_EQ(std::get<RecordTypes::e_VariableRecord>(new_record).GetFields().size(), 9);
 
     std::ifstream file_data = std::ifstream("./test_files/file4_data.dat", std::ios::in | std::ios::binary);
 
@@ -151,7 +149,7 @@ TEST_F(RecordDescFileParser, VerifyCanMapVariableDataRecord)  // NOLINT
 
     std::getline(file_data, buffer);
 
-    auto& variable_record = std::get<e_VariableRecord>(new_record.value());
+    auto& variable_record = std::get<RecordTypes::e_VariableRecord>(new_record);
 
     variable_record.UseData(std::string_view{buffer.data(), buffer.size()});
 
@@ -169,23 +167,21 @@ TEST_F(RecordDescFileParser, VerifyCanMapVariableDataRecord)  // NOLINT
 TEST_F(RecordDescFileParser, VerifyCanCreateFixedRecordWithArrayField)  // NOLINT
 {
     auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/file6_Record_Desc");
-    ASSERT_TRUE(new_record);
+    EXPECT_EQ(new_record.index(), RecordTypes::e_FixedRecord);
 
-    // verify new record type is FixedRecord
-    EXPECT_EQ(new_record.value().index(), e_FixedRecord);
     // test accessing a property
-    ASSERT_EQ(std::get<e_FixedRecord>(new_record.value()).GetBufferLen(), 179);
+    ASSERT_EQ(std::get<RecordTypes::e_FixedRecord>(new_record).GetBufferLen(), 179);
     //
-    auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
+    auto& fixed_record = std::get<RecordTypes::e_FixedRecord>(new_record);
     rng::for_each(fixed_record.GetFields(), [](const auto& fld) { std::print("{}\n", fld); });
 };
 
 TEST_F(RecordDescFileParser, VerifyCanCopyAndMoveThings)  // NOLINT
 {
     auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/file2_Record_Desc");
-    ASSERT_TRUE(new_record);
+    EXPECT_EQ(new_record.index(), RecordTypes::e_FixedRecord);
 
-    auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
+    auto& fixed_record = std::get<RecordTypes::e_FixedRecord>(new_record);
     auto record2 = fixed_record;
 
     EXPECT_TRUE(record2 == fixed_record);
@@ -198,7 +194,7 @@ TEST_F(RecordDescFileParser, VerifyCanCopyAndMoveThings)  // NOLINT
     std::string buffer;
     buffer.reserve(5000);
 
-    auto& fixed_record2 = std::get<e_FixedRecord>(new_record.value());
+    auto& fixed_record2 = std::get<RecordTypes::e_FixedRecord>(new_record);
 
     int ctr = 0;
     while (file_data.good() && ++ctr < 6)
@@ -218,9 +214,9 @@ class ArrayField : public Test
 TEST_F(ArrayField, TestFieldAccess)  // NOLINT
 {
     auto new_record = CRecordDescParser::ParseRecordDescFile("./test_files/mortality_2019_RecordDesc");
-    EXPECT_TRUE(new_record);
+    EXPECT_EQ(new_record.index(), RecordTypes::e_FixedRecord);
 
-    auto& fixed_record = std::get<e_FixedRecord>(new_record.value());
+    auto& fixed_record = std::get<RecordTypes::e_FixedRecord>(new_record);
 
     std::print("{}\n", fixed_record);
 
