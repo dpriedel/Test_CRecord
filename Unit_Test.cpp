@@ -238,7 +238,7 @@ TEST_F(ArrayField, TestFieldAccess)  // NOLINT
         // try to access our array field.
 
         const auto& conditions = fixed_record.GetField<CArrayField>("Conditions");
-        rng::for_each(conditions.GetArray(), [](const auto& cond) { std::print("cond: {}<-\n", cond); });
+        std::print("{}<-\n", conditions);
 
         EXPECT_EQ(conditions.GetArray().size(), fixed_record.ConvertFieldToNumber<size_t>("MultipleConditionCount"));
     }
