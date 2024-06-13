@@ -154,7 +154,7 @@ TEST_F(TestInstantiateCRecord, UseCRecordToActuallyDoSomething)  // NOLINT
 
         std::getline(file_data, buffer);
         stock_data_record.UseData(std::string_view{buffer.data(), buffer.size()});
-        std::print("Record with data: {}\n", stock_data_record);
+        std::print("Record with field names from header: {}\n", stock_data_record);
 
         std::vector<StockData> stock_data_history;
 
