@@ -85,6 +85,8 @@ TEST_F(RecordDescFileParser, VerifyCanCreateVariableRecord)  // NOLINT
     ASSERT_EQ(new_record.index(), RecordTypes::e_VariableRecord);
     // test accessing a property
     ASSERT_EQ(std::get<RecordTypes::e_VariableRecord>(new_record).GetFieldCount(), 47);
+
+    std::print("{}\n", new_record);
 };
 
 TEST_F(RecordDescFileParser, VerifyCanAddAllFixedRecordFields)  // NOLINT
